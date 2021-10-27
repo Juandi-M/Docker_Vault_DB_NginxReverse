@@ -1,0 +1,95 @@
+#version: "3.7"
+version: "2.4"
+
+services:
+  ################################################################################
+  # NGINX
+  ################################################################################
+  
+  # nginx:
+  #   image: jwilder/nginx-proxy
+  #   restart: unless-stopped
+  #   container_name: nginx-proxy
+  #   network_mode: "bridge"
+
+  #   # Where our data will be persisted
+  #   volumes:
+  #     - /tmp/certs:/etc/nginx/certs
+  #     - /tmp/nginx/vhost.d:/etc/nginx/vhost.d
+  #     - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  #   # <Port exposed> : < NIGNX Port running inside container> (HTTP & HTTPS)>
+  #   ports:
+  #     - "8080:80"
+  #     - "443:443"
+
+  ##############################################################################
+  # Vault
+  ##############################################################################
+ 
+  vault:
+    container_name: vault
+    #builds from static docker file instead of "latest" image that could compromise the whole deployment health in a prod enviroment.
+    build:
+      context: ./
+      dockerfile: Vault.dockerfile
+    restart: unless-stopped
+
+    environment:
+      #- "VIRTUAL_HOST=www.example.com"
+      - "VIRTUAL_PROTO=http"
+      - "VIRTUAL_PORT=80"
+      - "HTTPS_METHOD=redirect"
+
+    #volumes:
+    #  - ./vaultserver/config:/vaultserver/config/
+
+    ports:
+      # <Port exposed> : <Vault Port running inside container>
+      - "8200:8200"
+
+    #RAM ONLY
+    cap_add:
+      - IPC_LOCK
+
+    # HealthCheck Wait for whatever service or storage vault depens on before it tries to connect.
+    depends_on:
+      db:
+        condition: service_healthy
+
+    links:
+      - db
+    
+    command: "server -config=/vaultserver/config/"
+
+  ################################################################################
+  # Mysql
+  ################################################################################
+ 
+  db:
+    container_name: mysql
+    image: mysql:latest
+
+    ports:
+      # <Port exposed> : <MySQL Port running inside container>
+      - "3306:3306"
+
+    expose:
+      #Opens port 3306 on the container
+      - "3306"
+    
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_ROOT_PASS: secret
+      MYSQL_USER: foo
+      MYSQL_PASSWORD: bar
+      MYSQL_DATABASE: vault
+    
+    #volumes:
+     # - my-db:/var/lib/
+      
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
