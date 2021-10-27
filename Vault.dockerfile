@@ -79,10 +79,10 @@ EXPOSE 8200
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# Custom HashiCorp Configuration language file for 
+# Custom HashiCorp Configuration language file for deploys.
 COPY config.hcl vaultserver/config/
 
 # By default you'll get a single-node development server that stores everything
 # in RAM and bootstraps itself. Don't use this configuration for production.
-CMD ["server", "-config=/vault/config/vault-config.hcl"]
+CMD ["server", "-config=vaultserver/config/config.hcl"]
 #CMD ["server", "-dev"]
