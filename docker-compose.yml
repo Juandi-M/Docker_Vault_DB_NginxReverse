@@ -1,36 +1,37 @@
-#version: "3.7"
-version: "2.4"
+version: "3.7"
+# version: "2.4"
 
 services:
   ################################################################################
   # NGINX
   ################################################################################
-
-  reverse-proxy:
+  nginx:
     image: nginx:latest
-    # image: nginx:1.17.10
     #image: jwilder/nginx-proxy
     container_name: nignx_reverse_proxy
-
-    # HealthCheck Wait vault to be 
-    depends_on:
-      - vault
-      - db
+    restart: unless-stopped
+    
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     ports:
       - 8080:80
+
+    healthcheck:
+      test: service nginx status || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   ##############################################################################
   # Vault
   ##############################################################################
- 
   vault:
     container_name: vault_latest
+    image: vault:latest
     #builds from static docker file instead of "latest" image that could compromise the whole deployment health in a prod enviroment.
-    build:
-      context: ./
-      dockerfile: Vault.dockerfile
+    # build:
+    #   context: ./
+    #   dockerfile: Vault.dockerfile
     restart: unless-stopped
 
     environment:
@@ -39,8 +40,8 @@ services:
       - "VIRTUAL_PORT=80"
       - "HTTPS_METHOD=redirect"
 
-    #volumes:
-    #  - ./vaultserver/config:/vaultserver/config/
+    volumes:
+      - ./vault/vault-server.hcl:/vaultserver/config/vault-server.hcl
 
     ports:
       # <Port exposed> : <Vault Port running inside container>
@@ -49,24 +50,20 @@ services:
     #RAM ONLY
     cap_add:
       - IPC_LOCK
-
-    # HealthCheck Wait for whatever service or storage vault depens on before it tries to connect.
-    depends_on:
-      db:
-        condition: service_healthy
     
-    #command: "server -config=/vaultserver/config/"
+    command: "server -config /vaultserver/config/vault-server.hcl"
+    # command: "server -dev"
 
   ################################################################################
   # Mysql
   ################################################################################
- 
   db:
     container_name: mysql_latest
     image: mysql:latest
+    restart: unless-stopped
 
     ports:
-      # <Port exposed> : <MySQL Port running inside container>
+      # <External port mapping> : <internal port mapping>
       - "3306:3306"
 
     expose:
