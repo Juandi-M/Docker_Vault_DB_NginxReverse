@@ -1,0 +1,29 @@
+# Ignore Terraform state files
+*.tfstate
+*.tfstate.backup
+*.tfstate.backup.tmp
+*.tfstate.lock.info
+*.tfstate.lock
+
+# Ignore Terraform plan files
+*.tfplan
+
+# macOS system files
+.DS_Store
+
+# macOS thumbnail files
+._*
+
+# macOS folder attributes
+.AppleDouble
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+
+# macOS hidden files
+.Trashes
+.Spotlight-V100
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+.apdisk
