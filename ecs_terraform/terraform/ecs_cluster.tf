@@ -1,3 +1,3 @@
-resource "aws_ecs_cluster" "my_cluster" {
-  name = "my-cluster"
+resource "aws_ecs_cluster" "vault_nginx_cluster" {
+  name = "vault-nginx-cluster"
 }
