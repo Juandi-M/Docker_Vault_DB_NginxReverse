@@ -1,4 +1,4 @@
-resource "aws_ecs_task_definition" "my_task" {
+resource "aws_ecs_task_definition" "vault_nginx_task" {
   family                   = "my-family"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
