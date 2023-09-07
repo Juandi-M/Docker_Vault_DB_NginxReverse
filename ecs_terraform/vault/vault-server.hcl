@@ -1,8 +1,8 @@
 backend "mysql" {
- address = "db:3306"
- username = "foo"
- password = "bar"
- plaintext_connection_allowed = true
+  address = "${MYSQL_HOST}:1433"
+  username = "${MYSQL_USERNAME}"
+  password = "${MYSQL_PASSWORD}"
+  plaintext_connection_allowed = true
 }
 
 listener "tcp" {

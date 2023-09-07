@@ -41,6 +41,14 @@ resource "aws_s3_bucket" "vault_nginx_config_bucket" {
 resource "aws_s3_bucket_object" "nginx_conf_object" {
   bucket = aws_s3_bucket.vault_nginx_config_bucket.id
   key    = "nginx/nginx.conf"
-  source = "path/to/your/nginx.conf"          # Replace with the actual path to your nginx.conf
-  etag   = filemd5("path/to/your/nginx.conf") # Replace with the actual path
+  source = var.nginx_conf_path          # Variable
+  etag   = filemd5(var.nginx_conf_path) # Variable
+}
+
+# Upload vault.hcl to S3 Bucket
+resource "aws_s3_bucket_object" "vault_hcl_object" {
+  bucket = aws_s3_bucket.vault_nginx_config_bucket.id
+  key    = "vault/vault.hcl"
+  source = var.vault_hcl_path          # Variable
+  etag   = filemd5(var.vault_hcl_path) # Variable
 }
