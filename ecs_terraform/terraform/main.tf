@@ -7,7 +7,6 @@ terraform {
   }
 
   backend "s3" {
-    # bucket name where to keep terraform state file
     bucket  = "terraform-poc-us-east-1"
     profile = "default"
     encrypt = "true"
@@ -21,7 +20,6 @@ terraform {
 provider "aws" {
   region = "us-east-1"
 }
-
 
 # Fetch the existing VPC
 data "aws_vpc" "existing" {

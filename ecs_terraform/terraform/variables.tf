@@ -108,3 +108,17 @@ variable "private_subnet_tier" {
   type        = string
   default     = "private"
 }
+variable "vpc_name" {
+  description = "Name of the existing VPC"
+  type        = string
+}
+
+variable "public_subnet_tier" {
+  description = "Tier for public subnet"
+  type        = string
+}
+
+variable "private_subnet_tier" {
+  description = "Tier for private subnet"
+  type        = string
+}
